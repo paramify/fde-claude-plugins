@@ -1,0 +1,9 @@
+{
+  "name": "fde-linear",
+  "version": "0.1.0",
+  "description": "Run Paramify FDE client engagements in Linear: the engagement project and system templates, fetcher and validator issues, and the Fetcher Catalog.",
+  "license": "UNLICENSED",
+  "author": {
+    "name": "Paramify FDE"
+  }
+}
