@@ -180,10 +180,11 @@ formats: the lines added once work starts, Fix issues, and Validators issues.
 1. Assign it (`assignee`) and move it to **In Progress**.
 2. **Link the PR to its issues.** This applies to every repo, public or
    private.
-   - **Branch:** use the issue's Linear branch name: `gitBranchName` from
-     `get_issue`, or Cmd/Ctrl + Shift + . in the app. Linear's GitHub
-     integration is set to make it just the issue ID (`fde-123`), so it
-     carries no title. If it ever shows a title again, use the ID alone.
+   - **Branch:** the issue ID alone, lowercase: `fde-123`. Type it yourself.
+     Don't use Linear's copied branch name (`gitBranchName` from `get_issue`,
+     or Cmd/Ctrl + Shift + . in the app): it now carries your username and
+     the issue title, and paramify-fetchers is public. Linear links the
+     branch through the ID. Branches already pushed keep their names.
    - **PR description:** add one line for each issue the PR covers:
      - `Fixes FDE-123` when the PR finishes the issue;
      - `Part of FDE-123` when it's one of several PRs;
@@ -290,7 +291,7 @@ these seven, and skips Discovery, Design Review, Ready for Dev and Trio Review.
 
   Write "a real subscription" and describe behaviour in aggregate.
 - **No client names in paramify-fetchers,** which is public. Linear IDs go
-  only in the branch name (Linear's ID-only name) and in PR descriptions (see
+  only in the branch name (the ID alone, `fde-123`) and in PR descriptions (see
   "Working an issue").
 - **Several people edit these projects.** Read an issue right before you change
   it. If an issue isn't yours, add a comment instead of rewriting its scope.
@@ -309,6 +310,10 @@ these seven, and skips Discovery, Design Review, Ready for Dev and Trio Review.
   the prerequisites issue is answered.
 - **A PR on a plain branch with no `Fixes FDE-n` line.** Linear can't link
   it, the automations don't run, and the issue doesn't show the work.
+- **A branch from Linear's copied name, or `feat/...`.** The copied name puts
+  the issue title in a public repo, and `feat/...` has no ID for Linear to
+  link. Name new branches `fde-123`. The plugin's push hook stops Claude from
+  pushing a new branch with any other name to a paramify repo.
 - **An issue ID or client name in a PR title or commit message.** It stays in
   the public repo's history.
 

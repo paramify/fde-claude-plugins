@@ -8,6 +8,7 @@
     {
       "name": "fde-linear",
       "source": "./",
+      "version": "0.2.0",
       "description": "Run FDE client engagements in Linear: engagement and system templates, fetcher and validator issues, and the Fetcher Catalog.",
       "category": "productivity",
       "keywords": ["paramify", "fde", "linear", "fetchers", "validators"]
