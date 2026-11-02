@@ -3,9 +3,10 @@ name: fde-engagement
 description: >
   Run a Paramify FDE client engagement in Linear with the team's templates:
   find or create the client's initiative (led by the Forward Deployed
-  Engineers team), ask which of the team's services the client wants, create
-  the "<Client> - FDE Fetcher/Validator Service" project under it from the
-  "FDE/Client Fetcher+Validator Flow" template, add
+  Engineers team), ask which of the team's services the client wants
+  (fetcher and validator, pipeline scripting, pipeline configuration), create
+  each chosen service's "<Client> - <Service>" project under it, the fetcher
+  and validator one from the "FDE/Client Fetcher+Validator Flow" template, add
   a system (a "Phase 2/3 - <System>" milestone plus the "FDE System Delivery"
   issue tree), track Build, Extend, Fix, Conditional and Validators issues,
   set issue, project and initiative statuses, keep each project's Effort and
@@ -67,10 +68,15 @@ wants when you start an engagement ([step 2](#1-start-an-engagement)).
 | Service | Project | Templates | Set up with |
 |---|---|---|---|
 | FDE Fetcher/Validator Service | `<Client> - FDE Fetcher/Validator Service` | FDE/Client Fetcher+Validator Flow (project), FDE System Delivery (issue, one per system) | [Start an engagement](#1-start-an-engagement) steps 3–8, then [Add a system](#2-add-a-system) for each system |
+| FDE Pipeline Scripting Service | `<Client> - FDE Pipeline Scripting Service` | Being set up | [Services without a template](#services-without-a-template) |
+| FDE Pipeline Configuration Service | `<Client> - FDE Pipeline Configuration Service` | Being set up | [Services without a template](#services-without-a-template) |
 
-When the team creates a new service, add its row here in the same change as
-its template and setup steps, and bump the plugin version. Until a service has
-a row, this skill doesn't set it up.
+When the team adds a service, add its row here and bump the plugin version.
+A row can come before its template: until the template exists, the service is
+set up with [Services without a template](#services-without-a-template). When
+the template is made, name it in the row and give the service its own setup
+steps in the same change. Until a service has a row, this skill doesn't set
+it up.
 
 ## The templates
 
@@ -105,10 +111,12 @@ The flowchart numbers its phases differently:
 2. **Ask which services the client wants.** Use `AskUserQuestion` with
    `multiSelect: true` and one option per row of the [Services](#services)
    table: the service name as the label and its project as the description.
-   The tool needs at least two options, so while the table has one row, add
-   "None yet: initiative only".
+   Add "None yet: initiative only" as the last option. The tool takes at most
+   4 options per question, so once the table has more than 3 rows, split the
+   services across two questions in the same call.
    - Set up each chosen service from its row. Steps 3–8 below are the fetcher
-     and validator service's.
+     and validator service's; the pipeline services follow [Services without a
+     template](#services-without-a-template).
    - **A service typed under Other that isn't in the table:** don't invent a
      project name or template for it. Tell the user it isn't in the plugin
      yet and gets added to the Services table once the team creates it. The
@@ -186,6 +194,29 @@ The flowchart numbers its phases differently:
   `paramify/fde-workbook` repo. Its README is the how-to.
 - **Closing a step:** link what it produced on the issue, tick its End Result
   box if it has one, and move it to Done.
+
+### Services without a template
+
+The pipeline scripting and pipeline configuration services have no project
+template yet. Set one up like this:
+
+1. **Check for an existing project.** Run `list_projects` with team FDE and
+   the client's name. Use a `<Client> - <Service>` project that's already
+   there, and add it to the initiative if it isn't under it.
+2. **Create the project.** Call `save_project` with:
+   - `name` from the service's row;
+   - `addTeams` `["Forward Deployed Engineers"]`;
+   - `addInitiatives` `["<Client>"]`;
+   - `lead`, `startDate` and `priority`;
+   - `labels` `["<Effort>", "Unscoped"]`. The Effort criteria were written for
+     fetcher work, so judge Effort by the FDE time, and ask the lead.
+3. **Issues.** There's no template, so the project starts empty. Ask the lead
+   which issues to add. Don't copy the fetcher and validator template's phases
+   or issues into it.
+4. **Members and Slack:** as in step 6. Every client project posts to
+   #fde-engagement-updates.
+5. **Statuses:** as in step 8. Planned while we plan, In Progress once client
+   work starts, and the initiative goes Active with it.
 
 ## 2. Add a system
 
