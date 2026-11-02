@@ -8,7 +8,8 @@ description: >
   "FDE/Client Fetcher+Validator Flow" template, add
   a system (a "Phase 2/3 - <System>" milestone plus the "FDE System Delivery"
   issue tree), track Build, Extend, Fix, Conditional and Validators issues,
-  set issue, project and initiative statuses, and close out systems and
+  set issue, project and initiative statuses, keep each project's Effort and
+  Scope labels and weekly health current, and close out systems and
   engagements. Use when someone starts or sets up a client engagement or a new
   service for a client, adds or scopes a system, creates or updates fetcher or
   validator issues in a client project, asks where an issue or project
@@ -129,6 +130,9 @@ The flowchart numbers its phases differently:
    - `addTeams` `["Forward Deployed Engineers"]`;
    - `addInitiatives` `["<Client>"]`;
    - `lead` (the FDE who owns the engagement), `startDate` and `priority`;
+   - `labels` `["<Effort>", "Unscoped"]`, with a provisional Effort from the
+     contracted systems (see [Effort and Scope labels](#effort-and-scope-labels)).
+     Ask the lead if the contract doesn't tell you;
    - `links` for client-specific resources, such as the client's plan sheet
      (the Requirements Gathering workbook) and the client's Slack channel.
 
@@ -162,6 +166,9 @@ The flowchart numbers its phases differently:
    - Backlog → **Planned** when Phase 1 starts;
    - → **In Progress** at the first System Scope meeting, and the initiative
      → **Active** at the same time.
+
+   Once every contracted system has had its Coverage Meeting, confirm Effort
+   and set Scope to **Scoped**.
 
 **Phase 1** is the FDE's own work, done before the first System Scope meeting:
 
@@ -344,6 +351,78 @@ A client initiative's status follows its projects. FDE doesn't use Proposed.
 | Completed | Every project is Completed or Canceled: the contract has ended |
 | Canceled | The client ended before any work started |
 
+## Effort and Scope labels
+
+Every client project carries one label from each of two single-select
+project label groups of the FDE team. Risk isn't a label: the health on the
+weekly project update carries it.
+
+- **If the groups don't exist** (`list_project_labels` with team FDE shows no
+  Effort or Scope group), don't create them. Ask the lead to add them in the
+  team's label settings.
+- **`save_project`'s `labels` replaces the whole set.** Read the project's
+  labels with `get_project` first, and send them all with the one value
+  changed.
+
+**Effort** is how much work the project was scoped to be. Set it provisionally
+when the project is made, confirm it at the Coverage Meetings, and then leave
+it alone, even at close-out.
+
+| Effort | Criteria |
+|---|---|
+| Light | Existing fetchers cover nearly everything. Mostly validators and deployment, at most 2 fetcher extensions, no new fetchers. Under a quarter of one FDE's time. |
+| Moderate | New fetchers or extensions on platforms we support. Up to one FDE's time. |
+| Heavy | More than one FDE's time, or two FDEs. Also a new platform or a custom system. |
+
+**Scope** says whether scoping is done.
+
+| Scope | Criteria |
+|---|---|
+| Unscoped | New projects start here. Some contracted system hasn't had its Coverage Meeting, so its fetchers and validators aren't agreed and Effort is still provisional. |
+| Scoped | Every contracted system's fetchers and validators are agreed, each with an issue and a due date, and access is granted. |
+
+**Health** goes on each weekly project update (`save_status_update` with
+`type` `project` and `health`). It changes only when someone posts an update,
+so the update that changes it names the trigger and says whose turn it is,
+ours or the client's.
+
+| Health | When |
+|---|---|
+| On track | No trigger has fired. Before the Coverage Meetings, health covers only the Phase 1 work. |
+| At risk | One trigger has fired. |
+| Off track | Two triggers at once, or one trigger through two weekly updates. The project is taking capacity from other work: a resource drain. |
+
+Triggers:
+- scope added after the Coverage Meeting without the dates moving;
+- blocked on the client (access, answers or reviews) for over a week;
+- Fix issues or rework after delivery;
+- more FDE time than planned;
+- due dates missed two weeks in a row;
+- crowding out another engagement's due dates.
+
+Linear doesn't record most of these, so the update has to say so: being
+blocked, extra FDE time and crowding out show only there.
+
+| Labels and health | Reads as |
+|---|---|
+| Light · Scoped, On track | A light project |
+| Moderate · Scoped, On track | A well scoped build |
+| Heavy · Scoped, On track | Big, but planned that way: not a drain |
+| Any · Scoped, Off track | A resource drain; Heavy is the worst case |
+| Any · Unscoped | Waiting for its Coverage Meetings |
+
+**At close-out,** Effort keeps its planned value. The close-out update says
+which Effort level the project really took, backed by counts of its finished
+Build, Extend, Fix and Validators issues and the weeks from start to finish.
+Comparing the two across clients shows which kinds of client we
+under-estimate.
+
+**Initiatives get no Effort or Scope labels for now.** An initiative's Active
+projects column already rolls up its projects' health. If initiative labels
+are added later, Effort adds up (Light 1, Moderate 2, Heavy 4; a total of 1–2
+is Light, 3–4 Moderate, 5 or more Heavy), and Scope is Unscoped while any
+project is.
+
 ## Close-out
 
 - **Finishing a system.** Once everything under Build Phase is Done and the
@@ -366,8 +445,9 @@ A client initiative's status follows its projects. FDE doesn't use Proposed.
     into the client's private repo, and bring sanitized, anonymized fetchers
     and validators back to the public repo.
 
-  Then set the project to Maintenance, and to Completed when the contract
-  ends. When every project under the client's initiative is Completed or
+  Post the close-out update (see [Effort and Scope
+  labels](#effort-and-scope-labels)). Then set the project to Maintenance, and
+  to Completed when the contract ends. When every project under the client's initiative is Completed or
   Canceled, set the initiative to Completed.
 
 ## Rules
@@ -395,6 +475,10 @@ A client initiative's status follows its projects. FDE doesn't use Proposed.
   its lead team is visible to the whole workspace.
 - **Another service's work in the fetcher and validator project.** Give the
   service its own `<Client> - <Service>` project under the initiative.
+- **Changing Effort after the Coverage Meetings.** Effort is the plan. A
+  project that grew shows it in its health and its close-out update.
+- **Health with no reason.** An update that moves health names the trigger,
+  so the history explains it.
 - **A fetcher issue at the top level of the project.** It doesn't count toward
   its system. Set `parentId` to the system's Build Phase issue.
 - **A new issue with no milestone.** Set the milestone whenever you create an
