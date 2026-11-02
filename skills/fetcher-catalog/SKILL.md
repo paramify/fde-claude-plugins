@@ -119,11 +119,12 @@ When scoping a client's system (Phase 1 *Perform Gap Analysis*, or
    - **The catalog.** Search for the system and candidate names. Entries that
      are In Progress, Todo or Backlog have the client issue in Related, which
      tells you whose it is and when it's due.
-   - **The other engagement projects.** Run `list_issues` with team FDE, the
+   - **The other client projects.** Run `list_issues` with team FDE, the
      system or fetcher name as `query`, and no status filter. Then drop Done
-     and Canceled. Look for `Build …` and `Extend …` issues in any
-     `- FDE Engagement` project. This finds issues nobody has linked to the
-     catalog yet; link them now (step 2 of "When to update it").
+     and Canceled. Look for `Build …` and `Extend …` issues in any client's
+     fetcher and validator project (see [Client engagements](#client-engagements)).
+     This finds issues nobody has linked to the catalog yet; link them now
+     (step 2 of "When to update it").
    - **Open PRs and branches** in paramify-fetchers:
      `gh pr list --repo paramify/paramify-fetchers --state open --search "<system or name>"`.
      Also look for the fetcher's folder name in `git ls-remote --heads origin`.
@@ -159,8 +160,8 @@ When asked to sync or audit, or when the catalog looks stale:
 4. Act on the three lists it prints: create missing entries as Done, flip
    merged entries to Done with fresh descriptions, and ask about entries that
    are Done but no longer on main.
-5. Check FDE engagement projects for fetcher issues not yet linked (titles
-   matching the formats above) and add them to Related.
+5. Check every client's fetcher and validator project for fetcher issues not
+   yet linked (titles matching the formats above) and add them to Related.
 6. Report counts: created, updated, linked, and anything left for the user.
 
 For more than ~40 writes, put the payloads in JSON files and hand them to
@@ -187,9 +188,13 @@ seed did.
 
 ## Client engagements
 
-Every engagement project is named `<Client> - FDE Engagement` and is made from
-the FDE project template (see the fde-engagement skill). To find them all, run
-`list_projects` with team FDE and `query` `FDE Engagement`.
+Each client is an initiative led by the FDE team, and its fetcher and
+validator work is the project `<Client> - FDE Fetcher/Validator Service`, made
+from the FDE project template (see the fde-engagement skill). To find them
+all, run `list_projects` with team FDE and `query` `Fetcher/Validator
+Service`. Projects made before client initiatives are named `<Client> - FDE
+Engagement` until they're renamed, so also run it with `query` `FDE
+Engagement`.
 
 As of 2026-10-27:
 

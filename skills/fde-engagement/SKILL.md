@@ -2,30 +2,59 @@
 name: fde-engagement
 description: >
   Run a Paramify FDE client engagement in Linear with the team's templates:
-  create the "<Client> - FDE Engagement" project from the "FDE/Client
-  Fetcher+Validator Flow" template, add a system (a "Phase 2/3 - <System>"
-  milestone plus the "FDE System Delivery" issue tree), track Build, Extend,
-  Fix, Conditional and Validators issues, set issue and project statuses, and
-  close out systems and engagements. Use when someone starts or sets up a
-  client engagement, adds or scopes a system, creates or updates fetcher or
-  validator issues in an engagement project, asks where an issue belongs or
-  what status an issue or project should have, asks what a template issue
-  means, or asks why a project's updates aren't reaching Slack. Use the
-  fetcher-catalog skill alongside it for reuse checks and catalog updates.
+  find or create the client's initiative (led by the Forward Deployed
+  Engineers team), create the "<Client> - FDE Fetcher/Validator Service"
+  project under it from the "FDE/Client Fetcher+Validator Flow" template, add
+  a system (a "Phase 2/3 - <System>" milestone plus the "FDE System Delivery"
+  issue tree), track Build, Extend, Fix, Conditional and Validators issues,
+  set issue, project and initiative statuses, and close out systems and
+  engagements. Use when someone starts or sets up a client engagement or a new
+  service for a client, adds or scopes a system, creates or updates fetcher or
+  validator issues in a client project, asks where an issue or project
+  belongs, what status an issue, project or initiative should have, or what a
+  template issue means, or asks why a project's updates aren't reaching Slack.
+  Use the fetcher-catalog skill alongside it for reuse checks and catalog
+  updates.
 ---
 
 # FDE engagements in Linear
 
-Every client engagement is one Linear project in team **Forward Deployed
-Engineers** (key `FDE`), made from the **FDE/Client Fetcher+Validator Flow**
-project template, with one **FDE System Delivery** issue tree per system.
+Every client is one Linear **initiative**, led by team **Forward Deployed
+Engineers** (key `FDE`). Each service we deliver to that client is one
+project under it. The fetcher and validator service is the project
+**`<Client> - FDE Fetcher/Validator Service`**, made from the **FDE/Client
+Fetcher+Validator Flow** project template, with one **FDE System Delivery**
+issue tree per system.
 
-- **Worked example:** **Vastian - FDE Engagement** (`P-FDE-313`). When unsure
-  how something is laid out, look at how Vastian does it.
+- **Worked example:** Vastian's fetcher and validator project (`P-FDE-313`).
+  When unsure how something is laid out, look at how Vastian does it.
 - **For people:** the Slack canvas *FDE How-To: Client Engagements in Linear*
   (https://paramify.slack.com/docs/T039B6HQUGZ/F0C8Y5BQ56C) is the guide this
   skill follows. If the two disagree, the canvas wins; tell the user so the
   skill gets fixed.
+
+## Clients, services and projects
+
+| In Linear | Holds | Named |
+|---|---|---|
+| Initiative | One client | `<Client>` |
+| Project | One service for that client | `<Client> - <Service>`, such as `<Client> - FDE Fetcher/Validator Service` |
+
+- **Lead team:** every client initiative has Forward Deployed Engineers as
+  its lead team. FDE is a private team, so only its members see these
+  initiatives. An initiative without a lead team is visible to the whole
+  workspace.
+- **Owner:** the FDE who leads the client.
+- **Project names keep the client prefix.** Projects also show in team lists,
+  outside their initiative, where the prefix is the only thing that tells them
+  apart.
+- **Other services** get their own project under the same initiative. Work
+  for the client that isn't fetchers or validators goes there, not in the
+  fetcher and validator project. A project owned by another team keeps its
+  team's visibility, but that team can't see the private client initiative.
+- **Work for every client** stays outside client initiatives: Fetcher Catalog,
+  Fetcher Coverage, Validator Library, Comparator Fetchers and Fetchers -
+  Maintenance.
 
 ## The templates
 
@@ -48,42 +77,63 @@ The flowchart numbers its phases differently:
 
 ## 1. Start an engagement
 
-1. **Check for an existing project.** Run `list_projects` with team FDE and the
-   client's name. Projects from before the template (such as "<Client> -
-   Fetchers") are not engagement projects. Don't build on them; move or link
-   their open issues only with the lead's OK.
-2. **Create the project.** Call `save_project` with:
-   - `name` `<Client> - FDE Engagement`;
+1. **Find or create the client's initiative.** Run `list_initiatives` with the
+   client's name as `query`. If there is none, call `save_initiative` with:
+   - `name` `<Client>`;
+   - `leadTeam` `Forward Deployed Engineers`;
+   - `owner` (the FDE who leads the client) and `status` `Planned`;
+   - `targetDate`, the contract's end date, if you know it.
+
+   Check with `get_initiative` that the lead team is FDE before you add
+   anything to it.
+2. **Check for an existing project.** Run `list_projects` with team FDE and the
+   client's name.
+   - **Named `<Client> - FDE Engagement`, or not under the initiative:** it
+     was made before client initiatives. With the lead's OK, rename it to
+     `<Client> - FDE Fetcher/Validator Service` and add it to the initiative
+     (`save_project` with `name` and `addInitiatives`), then use it.
+   - **From before the template,** such as "<Client> - Fetchers": add it to
+     the initiative so the client's work is in one place, but don't build on
+     it. Move or link its open issues only with the lead's OK.
+3. **Create the project.** Call `save_project` with:
+   - `name` `<Client> - FDE Fetcher/Validator Service`;
    - `template` `FDE/Client Fetcher+Validator Flow`;
    - `addTeams` `["Forward Deployed Engineers"]`;
+   - `addInitiatives` `["<Client>"]`;
    - `lead` (the FDE who owns the engagement), `startDate` and `priority`;
    - `links` for client-specific resources, such as the client's plan sheet
      (the Requirements Gathering workbook) and the client's Slack channel.
 
    Leave `description` out: passing one replaces the template's links table.
-3. **Check what the template made.** Run `get_project` with
+4. **Check what the template made.** Run `get_project` with
    `includeMilestones`, then `list_issues` for the project. You should see 3
    milestones and 11 issues, all in Backlog. Template issues can arrive a few
    seconds after the project, so list again before you add anything by hand.
-4. **Things the API can't set; ask the lead to do them in the Linear app:**
+   Check the project shows the client's initiative too.
+5. **Things the API can't set; ask the lead to do them in the Linear app:**
    - **Members:** everyone working on the engagement.
    - **Slack:** click the bell in the project header, connect Slack, and pick
-     **#fde-engagement-updates** with project updates on. Every engagement
-     project posts there.
+     **#fde-engagement-updates** with project updates on. Every client
+     project posts there. Projects in a private team don't post to the
+     workspace's default channel, so this step is needed for every project.
 
      To check it, `get_project` should show `slackChannelId`
      `C0CCMA23B98`. The channel also shows a "Notifications for <project> are
      now enabled" message.
-5. **Prerequisites issue.** If some fetchers depend on the client's answers
+   - **Initiative updates** are optional: post them only once a client has
+     more than one service project. If you do, set the initiative's Slack
+     channel from its own bell menu as well.
+6. **Prerequisites issue.** If some fetchers depend on the client's answers
    (licences, tools, APIs):
    - add a Phase 1 issue that lists those questions;
    - make it `blocks` every issue that relies on them.
 
    Vastian's is FDE-2.
-6. **Project status.** Set `state` as the engagement moves (see
-   [Project statuses](#project-statuses)):
+7. **Project and initiative status.** Set `state` as the engagement moves (see
+   [Statuses](#statuses)):
    - Backlog → **Planned** when Phase 1 starts;
-   - → **In Progress** at the first System Scope meeting.
+   - → **In Progress** at the first System Scope meeting, and the initiative
+     → **Active** at the same time.
 
 **Phase 1** is the FDE's own work, done before the first System Scope meeting:
 
@@ -255,6 +305,17 @@ these seven, and skips Discovery, Design Review, Ready for Dev and Trio Review.
 | Completed | The contract has ended |
 | Canceled | The engagement ended early or never started |
 
+### Initiative statuses
+
+A client initiative's status follows its projects. FDE doesn't use Proposed.
+
+| Status | Use it when |
+|---|---|
+| Planned | The client has signed, and none of its projects is In Progress yet |
+| Active | Any of its projects is In Progress, On Hold or Maintenance |
+| Completed | Every project is Completed or Canceled: the contract has ended |
+| Canceled | The client ended before any work started |
+
 ## Close-out
 
 - **Finishing a system.** Once everything under Build Phase is Done and the
@@ -278,7 +339,8 @@ these seven, and skips Discovery, Design Review, Ready for Dev and Trio Review.
     and validators back to the public repo.
 
   Then set the project to Maintenance, and to Completed when the contract
-  ends.
+  ends. When every project under the client's initiative is Completed or
+  Canceled, set the initiative to Completed.
 
 ## Rules
 
@@ -300,6 +362,11 @@ these seven, and skips Discovery, Design Review, Ready for Dev and Trio Review.
 
 ## Common mistakes
 
+- **A client project with no initiative,** or an initiative with no lead team.
+  The project drops out of the client's view, and an initiative without FDE as
+  its lead team is visible to the whole workspace.
+- **Another service's work in the fetcher and validator project.** Give the
+  service its own `<Client> - <Service>` project under the initiative.
 - **A fetcher issue at the top level of the project.** It doesn't count toward
   its system. Set `parentId` to the system's Build Phase issue.
 - **A new issue with no milestone.** Set the milestone whenever you create an
