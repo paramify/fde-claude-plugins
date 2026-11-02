@@ -51,3 +51,8 @@ Its tests: `python3 tests/test_branch_name_guard.py`.
 The skills reflect how the team runs engagements. When the process changes,
 update the skill in the same PR as the template change, and bump `version` in
 `.claude-plugin/plugin.json` (the marketplace entry carries no version).
+
+**Adding a service:** give it a row in the Services table of
+`skills/fde-engagement/SKILL.md` (its project name, templates and setup
+steps), in the same PR as its template. The skill offers only the services in
+that table when it asks which ones a client wants.

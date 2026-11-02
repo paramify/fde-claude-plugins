@@ -3,8 +3,9 @@ name: fde-engagement
 description: >
   Run a Paramify FDE client engagement in Linear with the team's templates:
   find or create the client's initiative (led by the Forward Deployed
-  Engineers team), create the "<Client> - FDE Fetcher/Validator Service"
-  project under it from the "FDE/Client Fetcher+Validator Flow" template, add
+  Engineers team), ask which of the team's services the client wants, create
+  the "<Client> - FDE Fetcher/Validator Service" project under it from the
+  "FDE/Client Fetcher+Validator Flow" template, add
   a system (a "Phase 2/3 - <System>" milestone plus the "FDE System Delivery"
   issue tree), track Build, Extend, Fix, Conditional and Validators issues,
   set issue, project and initiative statuses, and close out systems and
@@ -48,13 +49,27 @@ issue tree per system.
 - **Project names keep the client prefix.** Projects also show in team lists,
   outside their initiative, where the prefix is the only thing that tells them
   apart.
-- **Other services** get their own project under the same initiative. Work
-  for the client that isn't fetchers or validators goes there, not in the
-  fetcher and validator project. A project owned by another team keeps its
-  team's visibility, but that team can't see the private client initiative.
+- **Other services** get their own project under the same initiative, once
+  they're in the [Services](#services) table. Work for the client that isn't
+  fetchers or validators goes there, not in the fetcher and validator project.
+  A project owned by another team keeps its team's visibility, but that team
+  can't see the private client initiative.
 - **Work for every client** stays outside client initiatives: Fetcher Catalog,
   Fetcher Coverage, Validator Library, Comparator Fetchers and Fetchers -
   Maintenance.
+
+## Services
+
+The services this skill can set up for a client. Ask which ones the client
+wants when you start an engagement ([step 2](#1-start-an-engagement)).
+
+| Service | Project | Templates | Set up with |
+|---|---|---|---|
+| FDE Fetcher/Validator Service | `<Client> - FDE Fetcher/Validator Service` | FDE/Client Fetcher+Validator Flow (project), FDE System Delivery (issue, one per system) | [Start an engagement](#1-start-an-engagement) steps 3–8, then [Add a system](#2-add-a-system) for each system |
+
+When the team creates a new service, add its row here in the same change as
+its template and setup steps, and bump the plugin version. Until a service has
+a row, this skill doesn't set it up.
 
 ## The templates
 
@@ -86,7 +101,20 @@ The flowchart numbers its phases differently:
 
    Check with `get_initiative` that the lead team is FDE before you add
    anything to it.
-2. **Check for an existing project.** Run `list_projects` with team FDE and the
+2. **Ask which services the client wants.** Use `AskUserQuestion` with
+   `multiSelect: true` and one option per row of the [Services](#services)
+   table: the service name as the label and its project as the description.
+   The tool needs at least two options, so while the table has one row, add
+   "None yet: initiative only".
+   - Set up each chosen service from its row. Steps 3–8 below are the fetcher
+     and validator service's.
+   - **A service typed under Other that isn't in the table:** don't invent a
+     project name or template for it. Tell the user it isn't in the plugin
+     yet and gets added to the Services table once the team creates it. The
+     initiative can still be made.
+   - **No way to ask** (a subagent, or a run with no user): don't guess. Send
+     the question back to whoever asked.
+3. **Check for an existing project.** Run `list_projects` with team FDE and the
    client's name.
    - **Named `<Client> - FDE Engagement`, or not under the initiative:** it
      was made before client initiatives. With the lead's OK, rename it to
@@ -95,7 +123,7 @@ The flowchart numbers its phases differently:
    - **From before the template,** such as "<Client> - Fetchers": add it to
      the initiative so the client's work is in one place, but don't build on
      it. Move or link its open issues only with the lead's OK.
-3. **Create the project.** Call `save_project` with:
+4. **Create the project.** Call `save_project` with:
    - `name` `<Client> - FDE Fetcher/Validator Service`;
    - `template` `FDE/Client Fetcher+Validator Flow`;
    - `addTeams` `["Forward Deployed Engineers"]`;
@@ -105,12 +133,12 @@ The flowchart numbers its phases differently:
      (the Requirements Gathering workbook) and the client's Slack channel.
 
    Leave `description` out: passing one replaces the template's links table.
-4. **Check what the template made.** Run `get_project` with
+5. **Check what the template made.** Run `get_project` with
    `includeMilestones`, then `list_issues` for the project. You should see 3
    milestones and 11 issues, all in Backlog. Template issues can arrive a few
    seconds after the project, so list again before you add anything by hand.
    Check the project shows the client's initiative too.
-5. **Things the API can't set; ask the lead to do them in the Linear app:**
+6. **Things the API can't set; ask the lead to do them in the Linear app:**
    - **Members:** everyone working on the engagement.
    - **Slack:** click the bell in the project header, connect Slack, and pick
      **#fde-engagement-updates** with project updates on. Every client
@@ -123,13 +151,13 @@ The flowchart numbers its phases differently:
    - **Initiative updates** are optional: post them only once a client has
      more than one service project. If you do, set the initiative's Slack
      channel from its own bell menu as well.
-6. **Prerequisites issue.** If some fetchers depend on the client's answers
+7. **Prerequisites issue.** If some fetchers depend on the client's answers
    (licences, tools, APIs):
    - add a Phase 1 issue that lists those questions;
    - make it `blocks` every issue that relies on them.
 
    Vastian's is FDE-2.
-7. **Project and initiative status.** Set `state` as the engagement moves (see
+8. **Project and initiative status.** Set `state` as the engagement moves (see
    [Statuses](#statuses)):
    - Backlog → **Planned** when Phase 1 starts;
    - → **In Progress** at the first System Scope meeting, and the initiative
