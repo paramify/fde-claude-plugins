@@ -4,7 +4,8 @@ description: >
   Run a Paramify FDE client engagement in Linear with the team's templates:
   find or create the client's initiative (led by the Forward Deployed
   Engineers team), ask which of the team's services the client wants
-  (fetcher and validator, pipeline scripting, pipeline configuration), create
+  (fetcher and validator, pipeline scripting, inventory pipeline, scan
+  pipeline), create
   each chosen service's "<Client> - <Service>" project under it, the fetcher
   and validator one from the "FDE/Client Fetcher+Validator Flow" template, add
   a system (a "Phase 2/3 - <System>" milestone plus the "FDE System Delivery"
@@ -69,7 +70,15 @@ wants when you start an engagement ([step 2](#1-start-an-engagement)).
 |---|---|---|---|
 | FDE Fetcher/Validator Service | `<Client> - FDE Fetcher/Validator Service` | FDE/Client Fetcher+Validator Flow (project), FDE System Delivery (issue, one per system) | [Start an engagement](#1-start-an-engagement) steps 3–8, then [Add a system](#2-add-a-system) for each system |
 | FDE Pipeline Scripting Service | `<Client> - FDE Pipeline Scripting Service` | Being set up | [Services without a template](#services-without-a-template) |
-| FDE Pipeline Configuration Service | `<Client> - FDE Pipeline Configuration Service` | Being set up | [Services without a template](#services-without-a-template) |
+| FDE Inventory Pipeline Service | `<Client> - FDE Inventory Pipeline Service` | Being set up | [Services without a template](#services-without-a-template) |
+| FDE Scan Pipeline Service | `<Client> - FDE Scan Pipeline Service` | Being set up | [Services without a template](#services-without-a-template) |
+
+Inventory and scan pipelines are separate services because each scopes and
+assesses gaps differently. Each project gets one `Phase 2/3 - <Pipeline>`
+milestone per pipeline, worked from its mapping workbook. Scan findings link
+to inventory items only through the inventory's Unique ID, so a scan
+pipeline's Asset Identifier issue is `blockedBy` that issue in the Inventory
+Pipeline project.
 
 When the team adds a service, add its row here and bump the plugin version.
 A row can come before its template: until the template exists, the service is
@@ -197,8 +206,8 @@ The flowchart numbers its phases differently:
 
 ### Services without a template
 
-The pipeline scripting and pipeline configuration services have no project
-template yet. Set one up like this:
+The pipeline scripting, inventory pipeline and scan pipeline services have no
+project template yet. Set one up like this:
 
 1. **Check for an existing project.** Run `list_projects` with team FDE and
    the client's name. Use a `<Client> - <Service>` project that's already

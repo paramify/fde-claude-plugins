@@ -1,7 +1,7 @@
 {
   "name": "fde-linear",
-  "version": "0.4.0",
-  "description": "Run Paramify FDE client engagements in Linear: client initiatives, a project per service (fetcher and validator, pipeline scripting, pipeline configuration), the fetcher and validator project and system templates, fetcher and validator issues, and the Fetcher Catalog.",
+  "version": "0.5.0",
+  "description": "Run Paramify FDE client engagements in Linear: client initiatives, a project per service (fetcher and validator, pipeline scripting, inventory pipeline, scan pipeline), the fetcher and validator project and system templates, fetcher and validator issues, and the Fetcher Catalog.",
   "license": "UNLICENSED",
   "author": {
     "name": "Paramify FDE"

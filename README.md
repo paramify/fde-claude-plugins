@@ -4,7 +4,7 @@ A Claude Code plugin for running Paramify FDE client engagements in Linear.
 
 | Skill | Use it to |
 |---|---|
-| `fde-engagement` | Set up a client as an FDE-led initiative, start a project for each service the client wants (fetcher and validator from the project template; pipeline scripting and pipeline configuration, whose templates are being set up), add a system with the System Delivery template, and keep fetcher and validator issues and their statuses current |
+| `fde-engagement` | Set up a client as an FDE-led initiative, start a project for each service the client wants (fetcher and validator from the project template; pipeline scripting, inventory pipeline and scan pipeline, whose templates are being set up), add a system with the System Delivery template, and keep fetcher and validator issues and their statuses current |
 | `fetcher-catalog` | Check whether a fetcher already exists or is being built for another client, and keep the Fetcher Catalog project in step with the repo |
 
 ## Install
